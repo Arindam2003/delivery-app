@@ -5,6 +5,8 @@ import { IoEyeOff } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import { backendServer } from '../App';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 
 
@@ -35,21 +37,37 @@ const Signup = () => {
         withCredentials:true
       })
       console.log(response);
-      
     }
     catch(e){
       console.log(e);
     }
   }
 
-
+  const handleGoogleAuth=async()=>{
+      if(!mobile)
+      {
+        return alert("Mobile number require");
+      }
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      try {
+        const { data } = await axios.post(`${backendServer}/api/auth/google-auth`,{
+          fullName:result.user.displayName,
+          email:result.user.email,
+          role,
+          mobile
+        },{withCredentials:true})
+        
+      } catch (error) {
+        console.log(error);
+      }
+  }
 
 
   return (
     <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
       <div className='p-7 shadow-lg w-full max-w-md bg-white border-[1px] rounded-2xl' style={{ borderColor: borderColor }}>
         <h1 className='font-bold text-2xl text-yellow-600'>PetPooja</h1>
-        <p className='font-medium text-gray-500'>Get Started</p>
 
         {/* fullname */}
         <div className='mb-2'>
@@ -96,7 +114,9 @@ const Signup = () => {
         
         <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={signupHandler}>Signup</button>
 
-        <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer'>
+        <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer'
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle />
           <span>Signin with Google</span>
         </button>
