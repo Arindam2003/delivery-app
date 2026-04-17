@@ -7,6 +7,7 @@ import axios from "axios";
 import { backendServer } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
+import { ClipLoader } from "react-spinners"
 
 
 
@@ -28,38 +29,42 @@ const Signup = () => {
   const [mobile, setmobile] = useState("");
   const [password, setpassword] = useState("");
   const [role, setrole] = useState("user")
+  const [err,seterr]=useState("");
+  const [loader,setLoader]=useState(false);
 
   //! signup handler  
 
   const signupHandler=async()=>{
+    setLoader(true);
     try{
       const response = await axios.post(`${backendServer}/api/auth/signup`,{fullName,email,mobile,password,role},{
         withCredentials:true
       })
       console.log(response);
+      seterr("");
+      setLoader(false)
     }
     catch(e){
-      console.log(e);
+      seterr(e.response.data.message);
     }
   }
 
   const handleGoogleAuth=async()=>{
       if(!mobile)
       {
-        return alert("Mobile number require");
+        return seterr("mobile number require");
       }
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      console.log(result);
+      
       try {
-        const { data } = await axios.post(`${backendServer}/api/auth/google-auth`,{
-          fullName:result.user.displayName,
-          email:result.user.email,
-          role,
-          mobile
-        },{withCredentials:true})
-        
+        const { data } = await axios.post(`${backendServer }/api/auth/google-auth`,{fullName,email,mobile,password,role},{
+        withCredentials:true
+      })
+        console.log(data);
       } catch (error) {
-        console.log(error);
+        seterr(error.response.data.message);
       }
   }
 
@@ -72,19 +77,19 @@ const Signup = () => {
         {/* fullname */}
         <div className='mb-2'>
           <label htmlFor="fullname" className='block text-gray-800 mb-1 font-medium'>Full Name</label>
-          <input type="text" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your name' onChange={(e)=>setfullName(e.target.value)} value={fullName}/>
+          <input required type="text" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your name' onChange={(e)=>setfullName(e.target.value)} value={fullName}/>
         </div>
 
         {/* email */}
         <div className='mb-2'>
           <label htmlFor="email" className='block text-gray-800 mb-1 font-medium'>Email</label>
-          <input type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
+          <input required type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
         </div>
 
         {/* mobile */}
         <div className='mb-2'>
           <label htmlFor="mobile" className='block text-gray-800 mb-1 font-medium'>Mobile</label>
-          <input type="tel" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500' placeholder='Enter your Mobile number' onChange={(e) => setmobile(e.target.value)} value={mobile} />
+          <input required type="tel" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500' placeholder='Enter your Mobile number' onChange={(e) => setmobile(e.target.value)} value={mobile} />
         </div>
 
 
@@ -92,7 +97,7 @@ const Signup = () => {
         <div className='mb-2'>
           <label htmlFor="password" className='block text-gray-800 mb-1 font-medium'>Password</label>
           <div className='relative'>
-            <input type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
+            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
             <button className='absolute right-3 top-2' onClick={()=>setshowPassword(prev=>!prev)}>{!showPassword ? <FaEye /> : <IoEyeOff/>}</button>
           </div>
         </div>
@@ -111,8 +116,11 @@ const Signup = () => {
             ))}
           </div>
         </div>
-        
-        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={signupHandler}>Signup</button>
+        <p className='text-red-500'>{err}</p>
+        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={signupHandler} disabled={loader}>
+          {loader?<ClipLoader size={20}/>:"Sign up"}
+          Signup
+          </button>
 
         <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer'
           onClick={handleGoogleAuth}

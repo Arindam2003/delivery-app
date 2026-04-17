@@ -12,6 +12,7 @@ function Forgot() {
     const [otp, setotp] = useState("");
     const [newPassword, setnewPassword] = useState("");
     const [confpass, setconfpass] = useState("");
+    const [err,seterr]=useState("");
 
 
     const handleSendOtp=async()=>{
@@ -20,7 +21,7 @@ function Forgot() {
             console.log(result);
             setstep(2)
         } catch (error) {
-            console.log(error);
+            seterr(error.response.data.message);
         }
     }
     const handleVerifyOtp=async()=>{
@@ -29,7 +30,7 @@ function Forgot() {
             console.log(result);
             setstep(3)
         } catch (error) {
-            console.log(error);
+            seterr(error.response.data.message);
         }
     }
     const handleResetPassword=async()=>{
@@ -38,7 +39,7 @@ function Forgot() {
             console.log(result);
             navigate("/signin")
         } catch (error) {
-            console.log(error);
+            seterr(error.response.data.message);
         }
     }
 
@@ -54,6 +55,7 @@ function Forgot() {
                     <label htmlFor="email" className='block text-gray-800 mb-1 font-medium'>Email</label>
                     <input type="email" className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-yellow-500 mt-1' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
 
+                    <p className="text-red-500">{err}</p>
                     <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={handleSendOtp} >Send Otp</button>
                 </div>}
 

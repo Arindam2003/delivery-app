@@ -5,6 +5,9 @@ import { IoEyeOff } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import { backendServer } from '../App';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { ClipLoader } from "react-spinners";
 
 
 
@@ -23,22 +26,41 @@ const Signin = () => {
   //? store all credential in state variable
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [err,seterr]=useState("");
+  const [loader,setLoader]=useState(false);
 
   //! Signin handler  
 
   const SigninHandler = async () => {
+    setLoader(true);
     try {
       const response = await axios.post(`${backendServer}/api/auth/signin`, {email, password}, {
         withCredentials: true
       })
       console.log(response);
-
+      seterr("");
+      setLoader(false);
     }
     catch (e) {
-      console.log(e);
+      seterr(e.response.data.message);
     }
   }
 
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    console.log(result);
+
+    try {
+      const { data } = await axios.post(`${backendServer}/api/auth/google-auth`, { email }, {
+        withCredentials: true
+      })
+      console.log(data);
+      seterr("");
+    } catch (error) {
+      seterr(error.response.data.message);
+    }
+  }
 
   return (
     <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
@@ -49,14 +71,14 @@ const Signin = () => {
         {/* email */}
         <div className='mb-2'>
           <label htmlFor="email" className='block text-gray-800 mb-1 font-medium'>Email</label>
-          <input type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
+          <input type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} required/>
         </div>
 
         {/* password */}
         <div className='mb-5 relative'>
           <label htmlFor="password" className='block text-gray-800 mb-1 font-medium'>Password</label>
           <div className='relative'>
-            <input type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
+            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
             <button className='absolute right-3 top-2' onClick={() => setshowPassword(prev => !prev)}>{!showPassword ? <FaEye /> : <IoEyeOff />}</button>
           </div>
           <p className='absolute right-0 text-yellow-700 cursor-pointer' onClick={()=>{
@@ -64,10 +86,12 @@ const Signin = () => {
           }}>Forgot Password</p>
         </div>
 
+        <p className='text-red-500'>{err}</p>
+        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={SigninHandler} disabled={loader}>
+          {loader?<ClipLoader size={20}/>:"Signin"}
+          Signin</button>
 
-        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={SigninHandler}>Signin</button>
-
-        <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer'>
+        <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer' onClick={handleGoogleAuth}>
           <FcGoogle />
           <span>Signin with Google</span>
         </button>
