@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+
 const isAuth=(req,res,next)=>{
     try {
         const token=req.cookies.token;
@@ -7,19 +9,22 @@ const isAuth=(req,res,next)=>{
                 message:"Token not found"
             })
         }
-        const decodeToken=jwt.verify(token,process.env.JWT_SECRET);
+        const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("JWT_SECRET:", process.env.JWT_SECRET);
         if(!decodeToken)
         {
             return res.status(400).json({
                 message:"token is not verify"
             })
         }
-        console.log(decodeToken);
         req.userId=decodeToken.userId
         next()
     } catch (error) {
-        return res.status(500).json({
-            message: "Authentication error"
-        })
+        console.log("JWT ERROR:", error.message);
+        return res.status(401).json({
+            message: error.message
+        });
     }
 }
+
+export default isAuth

@@ -1,6 +1,6 @@
 import User from "../models/user.model.js"
 
-export const getUser=async(req,res)=>{
+export const getCurrentUser=async(req,res)=>{
     try {
         const userId=req.userId;
         if(!userId)

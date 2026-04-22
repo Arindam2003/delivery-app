@@ -12,4 +12,5 @@ authRouter.post("/reset-password",resetPassword);
 authRouter.post("/google-auth",googleAuth);
 
 
+
 export default authRouter;

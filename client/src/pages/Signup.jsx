@@ -8,6 +8,8 @@ import { backendServer } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { ClipLoader } from "react-spinners"
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 
 
 
@@ -31,16 +33,24 @@ const Signup = () => {
   const [role, setrole] = useState("user")
   const [err,seterr]=useState("");
   const [loader,setLoader]=useState(false);
+  const dispatch=useDispatch()
 
   //! signup handler  
 
   const signupHandler=async()=>{
     setLoader(true);
     try{
-      const response = await axios.post(`${backendServer}/api/auth/signup`,{fullName,email,mobile,password,role},{
+      await axios.post(`${backendServer}/api/auth/signup`,{fullName,email,mobile,password,role},{
         withCredentials:true
       })
-      console.log(response);
+      const response = await axios.get(
+        `${backendServer}/api/user/current`,
+        { withCredentials: true }
+      );
+
+      dispatch(setUserData(response.data))
+      navigate("/");
+
       seterr("");
       setLoader(false)
     }
@@ -56,13 +66,21 @@ const Signup = () => {
       }
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      console.log(result);
-      
       try {
-        const { data } = await axios.post(`${backendServer }/api/auth/google-auth`,{fullName,email,mobile,password,role},{
-        withCredentials:true
-      })
-        console.log(data);
+        await axios.post(`${backendServer }/api/auth/google-auth`,{
+          fullName:result.user.displayName,
+          email:result.user.email,
+          mobile,
+          role
+        },{withCredentials:true}
+      )
+        const response = await axios.get(
+          `${backendServer}/api/user/current`,
+          { withCredentials: true }
+        );
+        dispatch(setUserData(response.data))
+        navigate("/");
+
       } catch (error) {
         seterr(error.response.data.message);
       }

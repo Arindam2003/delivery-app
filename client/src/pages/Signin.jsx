@@ -8,6 +8,8 @@ import { backendServer } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 
 
 
@@ -18,7 +20,6 @@ const Signin = () => {
   const bgColor = "#fff9f6";
   const borderColor = "#ddd";
 
-
   //! state variable setting ...
   const [showPassword, setshowPassword] = useState(true);
   const navigate = useNavigate();
@@ -28,34 +29,46 @@ const Signin = () => {
   const [password, setpassword] = useState("");
   const [err,seterr]=useState("");
   const [loader,setLoader]=useState(false);
+  const dispatch=useDispatch();
 
   //! Signin handler  
 
   const SigninHandler = async () => {
     setLoader(true);
     try {
-      const response = await axios.post(`${backendServer}/api/auth/signin`, {email, password}, {
+      await axios.post(`${backendServer}/api/auth/signin`, {email, password}, {
         withCredentials: true
       })
-      console.log(response);
+      const response=await axios.get(`${backendServer}/api/user/current`,{
+        withCredentials: true
+      })
+
+      dispatch(setUserData(response.data))
+      navigate("/");
       seterr("");
       setLoader(false);
     }
     catch (e) {
-      seterr(e.response.data.message);
+      seterr(e.response.data.message || "Login Failed");
+      setLoader(false);
     }
   }
 
   const handleGoogleAuth = async () => {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    console.log(result);
-
     try {
-      const { data } = await axios.post(`${backendServer}/api/auth/google-auth`, { email }, {
+      await axios.post(`${backendServer}/api/auth/google-auth`, { email:result.user.email }, {
         withCredentials: true
       })
-      console.log(data);
+
+      const response=await axios.get(`${backendServer}/api/user/current`, {
+        withCredentials: true
+      })
+
+      dispatch(setUserData(response.data))
+      navigate("/");
+
       seterr("");
     } catch (error) {
       seterr(error.response.data.message);
@@ -89,7 +102,7 @@ const Signin = () => {
         <p className='text-red-500'>{err}</p>
         <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={SigninHandler} disabled={loader}>
           {loader?<ClipLoader size={20}/>:"Signin"}
-          Signin</button>
+          </button>
 
         <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer' onClick={handleGoogleAuth}>
           <FcGoogle />
