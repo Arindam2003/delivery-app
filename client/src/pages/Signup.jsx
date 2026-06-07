@@ -15,7 +15,7 @@ import { setUserData } from '../redux/userSlice';
 
 const Signup = () => {
   //! Color setting...
-  const primaryColor = "#fad60e";
+  const primaryColor = "red";
   // const midtextColor = "#f5e161";
   const bgColor = "#fff9f6";
   const borderColor = "#ddd";
@@ -48,6 +48,8 @@ const Signup = () => {
         { withCredentials: true }
       );
 
+      // console.log(response);
+      
       dispatch(setUserData(response.data))
       navigate("/");
 
@@ -90,24 +92,25 @@ const Signup = () => {
   return (
     <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
       <div className='p-7 shadow-lg w-full max-w-md bg-white border-[1px] rounded-2xl' style={{ borderColor: borderColor }}>
-        <h1 className='font-bold text-2xl text-yellow-600'>PetPooja</h1>
+        <h1 className='font-bold text-3xl text-red-600'>Delivery</h1>
+        <p className='text-gray-600 mb-3'> Signup to Deliver your food </p>
 
         {/* fullname */}
         <div className='mb-2'>
-          <label htmlFor="fullname" className='block text-gray-800 mb-1 font-medium'>Full Name</label>
-          <input required type="text" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your name' onChange={(e)=>setfullName(e.target.value)} value={fullName}/>
+          <label htmlFor="fullname" className='block text-gray-700 mb-1 font-medium'>Full Name</label>
+          <input required type="text" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500 ' placeholder='Enter your name' onChange={(e)=>setfullName(e.target.value)} value={fullName}/>
         </div>
 
         {/* email */}
         <div className='mb-2'>
           <label htmlFor="email" className='block text-gray-800 mb-1 font-medium'>Email</label>
-          <input required type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
+          <input required type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} />
         </div>
 
         {/* mobile */}
         <div className='mb-2'>
           <label htmlFor="mobile" className='block text-gray-800 mb-1 font-medium'>Mobile</label>
-          <input required type="tel" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500' placeholder='Enter your Mobile number' onChange={(e) => setmobile(e.target.value)} value={mobile} />
+          <input required type="tel" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500' placeholder='Enter your Mobile number' onChange={(e) => setmobile(e.target.value)} value={mobile} />
         </div>
 
 
@@ -115,7 +118,7 @@ const Signup = () => {
         <div className='mb-2'>
           <label htmlFor="password" className='block text-gray-800 mb-1 font-medium'>Password</label>
           <div className='relative'>
-            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
+            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
             <button className='absolute right-3 top-2' onClick={()=>setshowPassword(prev=>!prev)}>{!showPassword ? <FaEye /> : <IoEyeOff/>}</button>
           </div>
         </div>
@@ -125,19 +128,19 @@ const Signup = () => {
           <label htmlFor="role" className='block text-gray-800 mb-1 font-medium'>Role</label>
           <div className='flex gap-2'>
             {["user", "owner", "deliveryboy"].map((r,index)=>(
-              <button className='border rounded-lg px-3 py-1 font-medium transition-colors' key={index}
+              <button className='border rounded-lg px-3 py-1 font-medium transition-colors ' key={index}
               onClick={()=>setrole(r)}
               style={
-                role == r ? { backgroundColor: primaryColor, border: "1px solid orange"} : { border:"1px solid orange"}
+                role == r ? { backgroundColor: primaryColor, border: "1px solid red", color: "white" } : { border:"1px solid red"}
               }
               >{r}</button>
             ))}
           </div>
         </div>
         <p className='text-red-500'>{err}</p>
-        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={signupHandler} disabled={loader}>
+
+        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#ff3636] hover:bg-[red] cursor-pointer text-white text-lg' onClick={signupHandler} disabled={loader}>
           {loader?<ClipLoader size={20}/>:"Sign up"}
-          Signup
           </button>
 
         <button className='w-full border-1 py-1 rounded-lg my-3 flex justify-center items-center gap-2 hover:bg-gray-200 transition duration-200 cursor-pointer'
@@ -147,7 +150,7 @@ const Signup = () => {
           <span>Signin with Google</span>
         </button>
 
-        <p className='w-full text-center cursor-pointer'>Already have an account? <span className='text-yellow-700' onClick={()=>{
+        <p className='w-full text-center cursor-pointer'>Already have an account? <span className='text-red-700' onClick={()=>{
           navigate('/signin');
         }}>Sign In</span></p>
       </div>

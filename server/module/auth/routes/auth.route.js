@@ -1,8 +1,9 @@
 import express from "express";
-import { googleAuth, resetPassword, sendOtp, signin, signout, signup, verifyOtp } from "../controllers/auth.controller.js";
+import { deletebyEmail, googleAuth, resetPassword, sendOtp, signin, signout, signup, verifyOtp } from "../controller/auth.controller.js";
 
 const authRouter=express.Router();
 
+authRouter.post("/delete", deletebyEmail)
 authRouter.post("/signup",signup);
 authRouter.post("/signin",signin);
 authRouter.get("/signout",signout);

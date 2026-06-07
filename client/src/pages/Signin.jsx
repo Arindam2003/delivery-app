@@ -78,20 +78,20 @@ const Signin = () => {
   return (
     <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
       <div className='p-7 shadow-lg w-full max-w-md bg-white border-[1px] rounded-2xl' style={{ borderColor: borderColor }}>
-        <h1 className='font-bold text-2xl text-yellow-600'>PetPooja</h1>
+        <h1 className='font-bold text-3xl text-red-600'>Delivery</h1>
 
 
         {/* email */}
-        <div className='mb-2'>
+        <div className='mb-2 mt-2'>
           <label htmlFor="email" className='block text-gray-800 mb-1 font-medium'>Email</label>
-          <input type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} required/>
+          <input type="email" className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500 ' placeholder='Enter your email' onChange={(e) => setemail(e.target.value)} value={email} required/>
         </div>
 
         {/* password */}
         <div className='mb-5 relative'>
           <label htmlFor="password" className='block text-gray-800 mb-1 font-medium'>Password</label>
           <div className='relative'>
-            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-yellow-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
+            <input required type={`${showPassword ? "text" : "password"}`} className='w-full border rounded-lg px-3 py-1 focus:outline-none focus:border-red-500 ' placeholder='Enter your password' onChange={(e) => setpassword(e.target.value)} value={password} />
             <button className='absolute right-3 top-2' onClick={() => setshowPassword(prev => !prev)}>{!showPassword ? <FaEye /> : <IoEyeOff />}</button>
           </div>
           <p className='absolute right-0 text-yellow-700 cursor-pointer' onClick={()=>{
@@ -100,7 +100,7 @@ const Signin = () => {
         </div>
 
         <p className='text-red-500'>{err}</p>
-        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#fad60e] hover:bg-[#fac30e] cursor-pointer' onClick={SigninHandler} disabled={loader}>
+        <button className='w-full font-semibold rounded-lg py-1 mt-4 transition duration-200 bg-[#f86363] hover:bg-[red] cursor-pointer text-white' onClick={SigninHandler} disabled={loader}>
           {loader?<ClipLoader size={20}/>:"Signin"}
           </button>
 

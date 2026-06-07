@@ -1,7 +1,35 @@
-import User from "../models/user.model.js";
+import User from "../model/user.model.js";
 import bcrypt from "bcryptjs";
-import token from "../utils/token.js";
-import { sendOtpMail } from "../utils/email.js";
+import token from "../../../common/utils/token.js";
+import { sendOtpMail } from "../../../common/utils/email.js";
+
+export const deletebyEmail=async(req,res)=>{
+    try{
+        const {email}=req.body;
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required"
+            });
+        }
+        const result=await User.deleteOne({
+            email
+        });
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+        if(result.deletedCount>0)
+        {
+            res.json({
+                message:"user deleted successfully"
+            })
+        }
+    }catch(e)
+    {
+        console.log(e);
+    }
+}
 
 export const signup = async (req, res) => {
     try {
@@ -13,6 +41,7 @@ export const signup = async (req, res) => {
             })
         }
 
+        //! use zod or joi for validation in future
         if (password.length < 5) {
             return res.status(400).json({
                 message: "Password is very poor"
@@ -20,12 +49,12 @@ export const signup = async (req, res) => {
         }
 
         if (mobile.toString().length < 10) {
-            return res.json({
+            return res.status(400).json({
                 message: "Invalid mobile number"
             })
         }
 
-        const hashedpass = await bcrypt.hash(password, 10);
+        const hashedpass = await bcrypt.hash(password, 10); //!using salt 10 for hashing password
 
         user = await User.create({
             fullname,
@@ -35,7 +64,8 @@ export const signup = async (req, res) => {
             role
         })
 
-        const gentoken = token(user._id);
+        const gentoken =await token(user._id);
+
         res.cookie("token", gentoken, {
             secure: false,
             sameSite: "strict",
@@ -43,15 +73,7 @@ export const signup = async (req, res) => {
             httpOnly: true
         })
 
-        return res.status(200).json({
-            message: "Signup successful",
-            user: {
-                _id: user._id,
-                fullname: user.fullname,
-                email: user.email,
-                role: user.role
-            }
-        });
+        return res.status(201).json(user);
 
     } catch (e) {
         return res.status(500).json({
@@ -65,20 +87,22 @@ export const signin = async (req, res) => {
         const { email, password } = req.body;
         let user = await User.findOne({ email })
         if (!user) {
-            //! must use statuscode for not found or backend req.
-            return res.status(404).json({
+            return res.status(400).json({
                 message: "User does not Exist"
             })
         }
 
-        const match = await bcrypt.compare(password, user.password)
-        if (!match) {
-            return res.status(401).json({
-                message: "Password not match"
+        // if exist
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Password incorrect"
             })
         }
 
-        const gentoken = token(user._id);
+        const gentoken =await token(user._id);
+
         res.cookie("token", gentoken, {
             secure: false,
             sameSite: "strict",
@@ -210,12 +234,12 @@ export const resetPassword = async (req, res) => {
     }
 };
 
-export const googleAuth = async (req,res) => {
+export const googleAuth = async (req, res) => {
     try {
-        const { fullname, email, mobile,role } = req.body;
-        let user =await User.findOne({ email })
+        const { fullname, email, mobile, role } = req.body;
+        let user = await User.findOne({ email })
         if (!user) {
-            user = await User.create({ fullname, email, mobile,role })
+            user = await User.create({ fullname, email, mobile, role })
         }
         const gentoken = token(user._id);
         res.cookie("token", gentoken, {
@@ -226,7 +250,7 @@ export const googleAuth = async (req,res) => {
         })
         return res.status(200).json(user);
     } catch (error) {
-        return res.status(500).json({message:"google auth error"})
+        return res.status(500).json({ message: "google auth error" })
     }
 }
 
